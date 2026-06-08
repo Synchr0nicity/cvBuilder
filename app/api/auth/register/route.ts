@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     const password = String(body.password ?? "");
     const confirmPassword = String(body.confirmPassword ?? "");
 
-    if (!email || password || !confirmPassword) {
+    if (!email || !password || !confirmPassword) {
       return Response.json(
         { error: "Missing required fields" },
         { status: 400 },

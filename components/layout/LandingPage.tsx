@@ -1,5 +1,3 @@
-import React from "react";
-import NavBar from "./NavBar";
 import { Flex, Heading } from "@chakra-ui/react";
 
 const LandingPage = () => {

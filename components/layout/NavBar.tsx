@@ -1,9 +1,11 @@
 "use client";
 import { Button, Flex, Text } from "@chakra-ui/react";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const NavBar = () => {
   const router = useRouter();
+  const { status } = useSession();
 
   return (
     <Flex
@@ -26,13 +28,23 @@ const NavBar = () => {
       >
         CVBUILDER
       </Text>
-      <Button
-        bg="lightblue"
-        color="black"
-        onClick={() => router.push("/login")}
-      >
-        Login
-      </Button>
+      {status === "unauthenticated" ? (
+        <Button
+          bg="lightblue"
+          color="black"
+          onClick={() => router.push("/login")}
+        >
+          Login
+        </Button>
+      ) : (
+        <Button
+          bg="lightblue"
+          color="black"
+          onClick={() => signOut({ callbackUrl: "/login" })}
+        >
+          Logout
+        </Button>
+      )}
     </Flex>
   );
 };

@@ -1,8 +1,23 @@
+"use client";
 import ResumeCard from "@/components/layout/dashboard/ResumeCard";
 import { Flex, Heading } from "@chakra-ui/react";
-import React from "react";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-const page = () => {
+const DashboardPage = () => {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [status, router]);
+
+  if (status === "loading") return null;
+  if (!session) return null;
+
   return (
     <Flex width="100%" height="100%" mt="100px" justifyContent="center">
       <Flex flexDir="column" gap="24px" alignItems="center">
@@ -19,4 +34,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default DashboardPage;
