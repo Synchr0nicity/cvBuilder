@@ -10,6 +10,7 @@ datasource db {
 model User {
   id           String  @id @default(cuid())
   email        String  @unique
+  emailVerified DateTime?
   name         String?
   image        String?
   passwordHash String?
@@ -20,23 +21,21 @@ model User {
   createAt  DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
 model Account {
   id                String  @id @default(cuid())
   userId            String
+  type              String
   provider          String
   providerAccountId String
-  accessToken       String?
-  refreshToken      String?
-  expiresAt         Int?
-  tokenType         String?
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
   scope             String?
-  idToken           String?
+  id_token          String?
+  session_state     String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   @@unique([provider, providerAccountId])
 }

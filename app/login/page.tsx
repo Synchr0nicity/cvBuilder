@@ -4,15 +4,21 @@ import { InputGroup } from "@/components/ui/input-group";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
+import { errorToJSON } from "next/dist/server/render";
 
 const LoginPage = () => {
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{
+    email: string | null;
+    password: string | null;
+    backendError: string | null;
+  }>({ email: null, password: null, backendError: null });
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
+
     setIsLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -21,9 +27,22 @@ const LoginPage = () => {
       .toLowerCase()
       .trim();
     const password = String(formData.get("password") ?? "");
+    const newErrors = {
+      email: "",
+      password: "",
+      backendError: "",
+    };
 
-    if (!email || !password) {
-      setError("Please enter your email and password.");
+    if (!email) {
+      newErrors.email = "Please enter your email.";
+    }
+
+    if (!password) {
+      newErrors.password = "Please enter your password.";
+    }
+
+    if (newErrors.email || newErrors.password) {
+      setError(newErrors);
       setIsLoading(false);
       return;
     }
@@ -37,7 +56,10 @@ const LoginPage = () => {
     setIsLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError((prev) => ({
+        ...prev,
+        backendError: "Invalid email or password.",
+      }));
       return;
     }
 
@@ -63,6 +85,7 @@ const LoginPage = () => {
             color="black"
             bg="transparent"
             _hover={{ bg: "gray", color: "white" }}
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
           >
             <i className="fa-brands fa-google"></i>
             Login with Google
@@ -73,6 +96,7 @@ const LoginPage = () => {
             color="black"
             bg="transparent"
             _hover={{ bg: "gray", color: "white" }}
+            onClick={() => signIn("linkedin", { callbackUrl: "/dashboard" })}
           >
             <i className="fa-brands fa-linkedin"></i>
             Login with Linkedin
@@ -84,9 +108,25 @@ const LoginPage = () => {
           <Box flex={1} h="1px" bg="gray" />
         </Flex>
         <form onSubmit={handleSubmit}>
+          {error.backendError && (
+            <Text mb="0" fontSize="16px" color="red">
+              {error.backendError}
+            </Text>
+          )}
           <Flex flexDir="column" gap="16px" width="100%">
             <Field.Root width="100%">
-              <Field.Label>Email</Field.Label>
+              <Flex
+                width="100%"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Field.Label>Email</Field.Label>
+                {error.email && (
+                  <Text mb="0" fontSize="12px" color="red">
+                    {error.email}
+                  </Text>
+                )}
+              </Flex>
               <InputGroup
                 width="100%"
                 startElement={<i className="fa-regular fa-envelope"></i>}
@@ -100,16 +140,35 @@ const LoginPage = () => {
               </InputGroup>
             </Field.Root>
             <Field.Root width="100%">
-              <Field.Label>Password</Field.Label>
+              <Flex
+                width="100%"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Field.Label>Password</Field.Label>
+                {error.password && (
+                  <Text mb="0" fontSize="12px" color="red">
+                    {error.password}
+                  </Text>
+                )}
+              </Flex>
               <InputGroup
                 width="100%"
                 startElement={<i className="fa-solid fa-lock"></i>}
-                endElement={<i className="fa-solid fa-eye"></i>}
+                endElement={
+                  <Box
+                    cursor="pointer"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    _hover={{ color: "lightBlue" }}
+                  >
+                    <i className="fa-solid fa-eye"></i>
+                  </Box>
+                }
               >
                 <Input
                   width="100%"
                   color="black"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Type your password"
                 />

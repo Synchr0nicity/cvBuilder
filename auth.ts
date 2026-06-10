@@ -13,8 +13,12 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
 
   providers: [
-    Google,
-    LinkedIn,
+    Google({
+      allowDangerousEmailAccountLinking: true,
+    }),
+    LinkedIn({
+      allowDangerousEmailAccountLinking: true,
+    }),
     Credentials({
       credentials: {
         email: {},

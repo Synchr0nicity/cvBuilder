@@ -5,7 +5,17 @@ import { signIn } from "next-auth/react";
 import { useState } from "react";
 
 export default function SignupPage() {
-  const [error, setError] = useState("");
+  const [error, setError] = useState<{
+    username?: string | null;
+    email: string | null;
+    password: string | null;
+    confirmPassword: string | null;
+  }>({ username: null, email: null, password: null, confirmPassword: null });
+
+  const [showPassword, setShowPassword] = useState<{
+    password: boolean;
+    confirmPassword: boolean;
+  }>({ password: false, confirmPassword: false });
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -15,6 +25,35 @@ export default function SignupPage() {
     const username = String(formData.get("username"));
     const password = String(formData.get("password"));
     const confirmPassword = String(formData.get("confirmPassword"));
+
+    const newErrors = {
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
+
+    if (!email) {
+      newErrors.email = "Please use a valid email";
+    }
+
+    if (!password || password.length < 13) {
+      newErrors.password = !password
+        ? "Please enter a password"
+        : "Password must be at least 12 characters";
+    }
+
+    if (!confirmPassword) {
+      newErrors.confirmPassword = "Please confirm your password";
+    }
+
+    if (confirmPassword !== password) {
+      newErrors.confirmPassword = "Passwords do not match";
+    }
+
+    if (newErrors.email || newErrors.password || newErrors.confirmPassword) {
+      setError(newErrors);
+      return;
+    }
 
     const res = await fetch("/api/auth/register", {
       method: "POST",
@@ -58,6 +97,7 @@ export default function SignupPage() {
             color="black"
             bg="transparent"
             _hover={{ bg: "gray", color: "white" }}
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
           >
             <i className="fa-brands fa-google" />
             Sign up with Google
@@ -69,6 +109,7 @@ export default function SignupPage() {
             color="black"
             bg="transparent"
             _hover={{ bg: "gray", color: "white" }}
+            onClick={() => signIn("linkedin", { callbackUrl: "/dashboard" })}
           >
             <i className="fa-brands fa-linkedin" />
             Sign up with Linkedin
@@ -98,7 +139,18 @@ export default function SignupPage() {
               </InputGroup>
             </Field.Root>
             <Field.Root w="100%">
-              <Field.Label>Email</Field.Label>
+              <Flex
+                width="100%"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Field.Label>Email</Field.Label>
+                {error.email && (
+                  <Text mb="0" fontSize="12px" color="red">
+                    {error.email}
+                  </Text>
+                )}
+              </Flex>
               <InputGroup
                 w="100%"
                 startElement={<i className="fa-regular fa-envelope" />}
@@ -114,12 +166,32 @@ export default function SignupPage() {
             </Field.Root>
 
             <Field.Root w="100%">
-              <Field.Label>Password</Field.Label>
+              <Flex
+                width="100%"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Field.Label>Password</Field.Label>
+                {error.password && (
+                  <Text mb="0" fontSize="12px" color="red">
+                    {error.password}
+                  </Text>
+                )}
+              </Flex>
               <InputGroup
                 w="100%"
                 startElement={<i className="fa-solid fa-lock" />}
                 endElement={
-                  <Box _hover={{ color: "lightBlue" }} cursor="pointer">
+                  <Box
+                    _hover={{ color: "lightBlue" }}
+                    onClick={() =>
+                      setShowPassword((prev) => ({
+                        ...prev,
+                        password: !prev.password,
+                      }))
+                    }
+                    cursor="pointer"
+                  >
                     <i className="fa-solid fa-eye" />
                   </Box>
                 }
@@ -127,7 +199,7 @@ export default function SignupPage() {
                 <Input
                   w="100%"
                   color="black"
-                  type="password"
+                  type={showPassword.password ? "text" : "password"}
                   name="password"
                   autoComplete="new-password"
                   placeholder="Type your password"
@@ -136,12 +208,34 @@ export default function SignupPage() {
             </Field.Root>
 
             <Field.Root w="100%">
-              <Field.Label>Confirm Password</Field.Label>
+              <Flex
+                width="100%"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Field.Label width="100%" textWrap="none">
+                  Confirm Password
+                </Field.Label>
+                {error.confirmPassword && (
+                  <Text mb="0" fontSize="12px" color="red">
+                    {error.confirmPassword}
+                  </Text>
+                )}
+              </Flex>
               <InputGroup
                 w="100%"
                 startElement={<i className="fa-solid fa-lock" />}
                 endElement={
-                  <Box _hover={{ color: "lightBlue" }} cursor="pointer">
+                  <Box
+                    _hover={{ color: "lightBlue" }}
+                    cursor="pointer"
+                    onClick={() =>
+                      setShowPassword((prev) => ({
+                        ...prev,
+                        confirmPassword: !prev.confirmPassword,
+                      }))
+                    }
+                  >
                     <i className="fa-solid fa-eye" />
                   </Box>
                 }
@@ -149,13 +243,18 @@ export default function SignupPage() {
                 <Input
                   w="100%"
                   color="black"
-                  type="password"
+                  type={showPassword.confirmPassword ? "text" : "password"}
                   name="confirmPassword"
                   placeholder="Retype your password"
                   autoComplete="confirm-password"
                 />
               </InputGroup>
             </Field.Root>
+            {error.confirmPassword === "Passwords do not match" && (
+              <Text textAlign="right" mb="0" fontSize="12px" color="red">
+                {error.confirmPassword}
+              </Text>
+            )}
           </Flex>
           <Flex justifyContent="flex-end" width="100%" mt="20px">
             <Button type="submit">Sign Up</Button>
