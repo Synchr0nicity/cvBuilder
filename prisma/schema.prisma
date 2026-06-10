@@ -45,80 +45,11 @@ model Resume {
   userId String
 
   title     String
-  summary   String?
-  template  String?
-  isDefault Boolean @default(false)
+  data      Json
+  style     Json
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  experiences Experience[]
-  education   Education[]
-  skills      Skill[]
-  projects    Project[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Experience {
-  id       String @id @default(cuid())
-  resumeId String
-
-  company     String
-  role        String
-  location    String?
-  startDate   DateTime?
-  endDate     DateTime?
-  isCurrent   Boolean   @default(false)
-  description String?
-
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Education {
-  id       String @id @default(cuid())
-  resumeId String
-
-  school      String
-  degree      String?
-  field       String?
-  location    String?
-  startDate   DateTime?
-  endDate     DateTime?
-  description String?
-
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Skill {
-  id       String @id @default(cuid())
-  resumeId String
-
-  name     String
-  category String?
-
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model Project {
-  id       String @id @default(cuid())
-  resumeId String
-
-  name        String
-  description String?
-  url         String?
-
-  resume Resume @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
