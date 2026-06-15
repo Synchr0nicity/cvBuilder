@@ -1,49 +1,25 @@
-"use client";
-import ResumeCard from "@/components/layout/dashboard/ResumeCard";
-import { createResume } from "@/components/layout/resume/resumeEditor/actions";
-import { Button, Flex, Heading } from "@chakra-ui/react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { auth } from "@/auth";
+import Dashboard from "@/components/layout/dashboard/Dashboard";
+import { prisma } from "@/lib/prisma";
+import { AppResume } from "@/types/resume";
+import { redirect } from "next/navigation";
 
-const DashboardPage = () => {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+const DashboardPage = async () => {
+  const session = await auth();
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.replace("/login");
-    }
-  }, [status, router]);
+  if (!session?.user?.id) {
+    redirect("/login");
+  }
 
-  if (status === "loading") return null;
-  if (!session) return null;
-
-  return (
-    <Flex width="100%" height="100%" mt="100px" justifyContent="center">
-      <Flex flexDir="column" gap="24px" alignItems="center">
-        <Heading>My Resumes</Heading>
-        <Button
-          onClick={() =>
-            createResume({
-              title: "Testio",
-              resumeData: "stuff",
-              style: null,
-            })
-          }
-        >
-          Create Resume
-        </Button>
-        <Flex width="100%" gap="10px">
-          <ResumeCard />
-          <ResumeCard />
-          <ResumeCard />
-          <ResumeCard />
-          <ResumeCard />
-        </Flex>
-      </Flex>
-    </Flex>
-  );
+  const resumes = await prisma.resume.findMany({
+    where: {
+      userId: session.user.id,
+    },
+    orderBy: {
+      updatedAt: "desc",
+    },
+  });
+  return <Dashboard resumes={resumes as AppResume[]} />;
 };
 
 export default DashboardPage;

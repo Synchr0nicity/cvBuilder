@@ -1,22 +1,32 @@
-export interface Resume {
+import { Resume as PrismaResume } from "@prisma/client";
+
+export type ResumeData = {
+  personalInfo?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+    profession?: string;
+  };
+  summary?: string;
+  workExperience?: Experience[];
+};
+
+export type Experience = {
   id: string;
-  userId: string;
-  title: string;
-  data: ResumeData;
-  style: ResumeStyle;
-  createdAt: string;
-  updatedAt: string;
-}
+  company?: string;
+  jobTitle?: string;
+  startDate?: string;
+  endDate?: string;
+  description?: string;
+};
 
-export interface ResumeData {
-  sections: ResumeSection[];
-}
-
-export interface ResumeSection {
-  id: string;
-  title: string;
-}
-
-export interface ResumeStyle {
+export type ResumeStyle = {
+  font?: string;
   primaryColor?: string;
-}
+};
+
+export type AppResume = Omit<PrismaResume, "data" | "style"> & {
+  data?: ResumeData;
+  style?: ResumeStyle;
+};

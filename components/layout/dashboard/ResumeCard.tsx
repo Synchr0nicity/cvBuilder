@@ -1,6 +1,11 @@
+"use client";
+import { AppResume } from "@/types/resume";
 import { Flex, Text } from "@chakra-ui/react";
+import { useRouter } from "next/navigation";
 
-const ResumeCard = () => {
+const ResumeCard = ({ resume }: { resume: AppResume }) => {
+  const router = useRouter();
+
   return (
     <Flex
       p="20px"
@@ -14,10 +19,11 @@ const ResumeCard = () => {
       cursor="pointer"
       _hover={{ bg: "lightBlue", borderColor: "darkBlue" }}
       transition={"all .15s ease-in-out"}
+      onClick={() => router.push(`/resume/${resume.id}`)}
     >
       <Flex alignItems="center" flexDir="column" gap="10px">
         <Text mb="0" fontSize="16px" fontWeight="700">
-          Resume Title
+          {resume?.title ?? "Resume"}
         </Text>
         <Flex flexDir="column" alignItems="center">
           <Text mb="0" fontSize="14px">
@@ -36,7 +42,7 @@ const ResumeCard = () => {
       >
         <Text fontSize="12px">Created at:</Text>
         <Text justifySelf="flex-end" fontSize="10px" fontWeight="700">
-          10:01pm, May 6th
+          {resume?.createdAt?.toLocaleDateString("en-GB")}
         </Text>
       </Flex>
     </Flex>

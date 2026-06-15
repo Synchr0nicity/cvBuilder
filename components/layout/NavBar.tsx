@@ -20,7 +20,7 @@ const NavBar = () => {
     >
       <Text
         cursor="pointer"
-        onClick={() => router.push("/")}
+        onClick={() => router.push("/dashboard")}
         mb="0"
         fontSize="24px"
         fontWeight="700"

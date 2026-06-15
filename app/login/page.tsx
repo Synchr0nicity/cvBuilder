@@ -4,7 +4,6 @@ import { InputGroup } from "@/components/ui/input-group";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
-import { errorToJSON } from "next/dist/server/render";
 
 const LoginPage = () => {
   const router = useRouter();
