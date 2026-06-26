@@ -1,44 +1,88 @@
 "use client";
 import { Flex, Field, Input } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import DraggableHeader from "./DraggableHeader";
 import { useForm, useWatch } from "react-hook-form";
 import { PersonalInfo, personalInfoAtom } from "@/atoms/resumeAtoms";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import debounce from "lodash/debounce";
+import { useParams } from "next/navigation";
+import { toaster } from "@/components/ui/toaster";
+import { updatePersonalInfo } from "../../../actions";
 
 const MotionFlex = motion(Flex);
 
 const PersonalInfoField = () => {
+  const params = useParams();
+  const resumeId = params.id as string;
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [personalInfo, setPersonalInfo] = useAtom(personalInfoAtom);
+  const saveToastId = "personal-info-save";
 
-  const personalInfo = useAtomValue(personalInfoAtom);
-  const setPersonalInfo = useSetAtom(personalInfoAtom);
-
-  const { register, control } = useForm<PersonalInfo>({
-    defaultValues: personalInfo,
+  const {
+    register,
+    control,
+    reset,
+    formState: { isDirty },
+  } = useForm<PersonalInfo>({
+    defaultValues: personalInfo ?? {},
   });
+
+  useEffect(() => {
+    if (!personalInfo) return;
+
+    reset(personalInfo, { keepDirty: false });
+  }, [personalInfo, reset]);
 
   const watchedField = useWatch({ control });
 
-  const debouncedSetField = useMemo(
+  const debouncedSave = useMemo(
     () =>
-      debounce((data: PersonalInfo) => {
-        setPersonalInfo(data);
-      }, 300),
-    [setPersonalInfo],
+      debounce(async (data: Partial<PersonalInfo>) => {
+        try {
+          toaster.create({
+            id: saveToastId,
+            title: "Saving",
+            type: "loading",
+          });
+
+          await updatePersonalInfo(resumeId, data);
+
+          toaster.update(saveToastId, {
+            title: "Saved",
+            type: "success",
+          });
+        } catch (error) {
+          toaster.create({
+            title: "Failed to save",
+            description:
+              error instanceof Error ? error.message : "Something went wrong",
+            type: "error",
+          });
+        }
+      }, 800),
+    [resumeId],
   );
 
   useEffect(() => {
+    if (!isDirty) return;
     if (!watchedField) return;
 
-    debouncedSetField(watchedField as PersonalInfo);
+    setPersonalInfo((prev) => ({
+      ...prev,
+      ...watchedField,
+    }));
 
+    debouncedSave(watchedField);
+  }, [watchedField, setPersonalInfo, debouncedSave, isDirty]);
+
+  useEffect(() => {
     return () => {
-      debouncedSetField.cancel();
+      debouncedSave.cancel();
+      toaster.dismiss(saveToastId);
     };
-  }, [watchedField, debouncedSetField]);
+  }, [debouncedSave]);
 
   return (
     <Flex

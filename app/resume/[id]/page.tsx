@@ -7,13 +7,12 @@ import { notFound, redirect } from "next/navigation";
 
 const ResumePage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const session = await auth();
+  const { id } = await params;
   if (!session?.user?.id) {
-    redirect("/login");
+    redirect(`/login?callbackUrl=/resume/${id}`);
   }
 
   console.log("RESUME PAGE SESSION:", session);
-
-  const { id } = await params;
 
   const resume = await prisma.resume.findFirst({
     where: {

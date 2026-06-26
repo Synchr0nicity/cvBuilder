@@ -24,11 +24,11 @@ const ResumeView = () => {
         boxShadow="0px 10px 40px -10px rgba(0, 0, 0, 0.1)"
       >
         <Heading>
-          {personalInfo?.firstName ?? "First Name"}{" "}
-          {personalInfo?.lastName ?? "Last Name"}
+          {personalInfo?.firstName || "First Name"}{" "}
+          {personalInfo?.lastName || "Last Name"}
         </Heading>
         <Text mb="0" color="#4F46E5">
-          {personalInfo?.profession ?? "Profession"}
+          {personalInfo?.profession || "Profession"}
         </Text>
       </Flex>
     </Flex>

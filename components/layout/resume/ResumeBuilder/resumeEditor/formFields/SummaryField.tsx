@@ -3,11 +3,16 @@ import { Field, Flex, Textarea } from "@chakra-ui/react";
 import { useState } from "react";
 import DraggableHeader from "./DraggableHeader";
 import { motion } from "framer-motion";
+import { useAtom } from "jotai";
+import { summaryAtom } from "@/atoms/resumeAtoms";
 
 const MotionFlex = motion(Flex);
 
 const PersonalInfoField = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [summary, setSummary] = useAtom(summaryAtom);
+
+  // const {} =
 
   return (
     <Flex

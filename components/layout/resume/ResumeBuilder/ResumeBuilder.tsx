@@ -22,14 +22,14 @@ const ResumeBuilder = ({ resume }: ResumeBuilderProps) => {
     setResume(resume);
   }, [resume, setResume]);
 
-  const { data: session } = useSession();
+  const { status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
-    if (!session) {
+    if (status === "unauthenticated") {
       router.push("/login");
     }
-  }, [session, router]);
+  }, [status, router]);
 
   return (
     <Flex

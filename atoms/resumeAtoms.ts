@@ -10,15 +10,18 @@ export const resumeAtom = atom<AppResume | null>(null);
 
 export const personalInfoAtom = atom(
   (get) => get(resumeAtom)?.data?.personalInfo,
-  (get, set, value: PersonalInfo) => {
+  (get, set, value: PersonalInfo | ((prev: PersonalInfo) => PersonalInfo)) => {
     const resume = get(resumeAtom);
     if (!resume) return;
+
+    const prev = resume.data?.personalInfo as PersonalInfo;
+    const next = typeof value === "function" ? value(prev) : value;
 
     set(resumeAtom, {
       ...resume,
       data: {
         ...resume.data,
-        personalInfo: value,
+        personalInfo: next,
       },
     });
   },

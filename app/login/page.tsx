@@ -1,9 +1,9 @@
 "use client";
 import { Box, Button, Field, Flex, Input, Text } from "@chakra-ui/react";
 import { InputGroup } from "@/components/ui/input-group";
-import { useRouter } from "next/navigation";
-import { signIn } from "next-auth/react";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -62,8 +62,21 @@ const LoginPage = () => {
       return;
     }
 
-    window.location.href = "/dashboard";
+    window.location.href = callbackUrl;
   }
+
+  const { status } = useSession();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+
+  useEffect(() => {
+    if (status === "authenticated") {
+      router.replace(callbackUrl);
+    }
+  }, [status, router, callbackUrl]);
+
+  if (status === "loading") return null;
+  if (status === "authenticated") return null;
 
   if (error) {
     console.log("login error:", error);
