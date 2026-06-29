@@ -1,18 +1,60 @@
 "use client";
 import { Field, Flex, Textarea } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DraggableHeader from "./DraggableHeader";
 import { motion } from "framer-motion";
 import { useAtom } from "jotai";
 import { summaryAtom } from "@/atoms/resumeAtoms";
+import { debounce } from "lodash";
+import { useParams } from "next/navigation";
+import { toaster } from "@/components/ui/toaster";
+import { updateResumeData } from "../../../actions";
 
 const MotionFlex = motion(Flex);
 
-const PersonalInfoField = () => {
+const SummaryField = () => {
+  const params = useParams();
+  const resumeId = params.id as string;
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [summary, setSummary] = useAtom(summaryAtom);
+  const saveToastId = "summary-save";
 
-  // const {} =
+  const debouncedSave = useMemo(
+    () =>
+      debounce(async (data: string) => {
+        try {
+          toaster.create({
+            id: saveToastId,
+            title: "Saving",
+            type: "loading",
+          });
+
+          await updateResumeData(resumeId, {
+            summary: data as string,
+          });
+
+          toaster.update(saveToastId, {
+            title: "Saved",
+            type: "success",
+          });
+        } catch (error) {
+          toaster.create({
+            title: "Failed to save",
+            description:
+              error instanceof Error ? error.message : "Something went wrong",
+            type: "error",
+          });
+        }
+      }, 800),
+    [resumeId],
+  );
+
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+
+    setSummary(value);
+    debouncedSave(value);
+  };
 
   return (
     <Flex
@@ -67,6 +109,8 @@ record of leading design teams and
 increasing user engagement by 40% across 
 SaaS platforms."
             minHeight="107px"
+            value={summary}
+            onChange={handleChange}
           />
         </Field.Root>
       </MotionFlex>
@@ -74,4 +118,4 @@ SaaS platforms."
   );
 };
 
-export default PersonalInfoField;
+export default SummaryField;

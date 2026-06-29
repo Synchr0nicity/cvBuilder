@@ -5,9 +5,9 @@ import { atomFamily } from "jotai-family";
 export type ResumeData = NonNullable<AppResume["data"]>;
 export type PersonalInfo = NonNullable<ResumeData["personalInfo"]>;
 export type Summary = NonNullable<ResumeData["summary"]>;
+export type WorkExperience = NonNullable<ResumeData["workExperience"]>;
 
 export const resumeAtom = atom<AppResume | null>(null);
-
 export const personalInfoAtom = atom(
   (get) => get(resumeAtom)?.data?.personalInfo,
   (get, set, value: PersonalInfo | ((prev: PersonalInfo) => PersonalInfo)) => {

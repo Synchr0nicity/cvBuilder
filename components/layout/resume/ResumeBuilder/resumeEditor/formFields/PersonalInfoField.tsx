@@ -9,7 +9,8 @@ import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import debounce from "lodash/debounce";
 import { useParams } from "next/navigation";
 import { toaster } from "@/components/ui/toaster";
-import { updatePersonalInfo } from "../../../actions";
+import { Prisma } from "@prisma/client";
+import { updateResumeData } from "../../../actions";
 
 const MotionFlex = motion(Flex);
 
@@ -29,11 +30,11 @@ const PersonalInfoField = () => {
     defaultValues: personalInfo ?? {},
   });
 
-  useEffect(() => {
-    if (!personalInfo) return;
+  // useEffect(() => {
+  //   if (!personalInfo) return;
 
-    reset(personalInfo, { keepDirty: false });
-  }, [personalInfo, reset]);
+  //   reset(personalInfo, { keepDirty: false });
+  // }, [personalInfo, reset]);
 
   const watchedField = useWatch({ control });
 
@@ -47,7 +48,9 @@ const PersonalInfoField = () => {
             type: "loading",
           });
 
-          await updatePersonalInfo(resumeId, data);
+          await updateResumeData(resumeId, {
+            personalInfo: data as Prisma.InputJsonObject,
+          });
 
           toaster.update(saveToastId, {
             title: "Saved",
@@ -65,24 +68,24 @@ const PersonalInfoField = () => {
     [resumeId],
   );
 
-  useEffect(() => {
-    if (!isDirty) return;
-    if (!watchedField) return;
+  // useEffect(() => {
+  //   if (!isDirty) return;
+  //   if (!watchedField) return;
 
-    setPersonalInfo((prev) => ({
-      ...prev,
-      ...watchedField,
-    }));
+  //   setPersonalInfo((prev) => ({
+  //     ...prev,
+  //     ...watchedField,
+  //   }));
 
-    debouncedSave(watchedField);
-  }, [watchedField, setPersonalInfo, debouncedSave, isDirty]);
+  //   debouncedSave(watchedField);
+  // }, [watchedField, setPersonalInfo, debouncedSave, isDirty]);
 
-  useEffect(() => {
-    return () => {
-      debouncedSave.cancel();
-      toaster.dismiss(saveToastId);
-    };
-  }, [debouncedSave]);
+  // useEffect(() => {
+  //   return () => {
+  //     debouncedSave.cancel();
+  //     toaster.dismiss(saveToastId);
+  //   };
+  // }, [debouncedSave]);
 
   return (
     <Flex

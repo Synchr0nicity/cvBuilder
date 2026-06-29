@@ -19,6 +19,7 @@ export type Experience = {
   startDate?: string;
   endDate?: string;
   description?: string;
+  location?: string;
 };
 
 export type ResumeStyle = {

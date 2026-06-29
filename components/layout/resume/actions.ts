@@ -4,7 +4,6 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { Prisma } from "@prisma/client";
 import { auth } from "@/auth";
-import { PersonalInfo } from "@/atoms/resumeAtoms";
 
 type createResumeData = {
   resumeData: Prisma.InputJsonValue;
@@ -33,9 +32,9 @@ export async function createResume(data: createResumeData) {
   redirect(`/resume/${resume.id}`);
 }
 
-export async function updatePersonalInfo(
+export async function updateResumeData(
   resumeId: string,
-  personalInfo: Partial<PersonalInfo>,
+  patch: Prisma.InputJsonObject,
 ) {
   const session = await auth();
 
@@ -51,23 +50,20 @@ export async function updatePersonalInfo(
   });
 
   if (!resume) {
-    throw new Error("resume not found");
+    throw new Error("Resume not found");
   }
 
-  const currentData = resume.data as Record<string, unknown>;
+  const currentData = resume.data as Prisma.JsonObject;
+
+  const nextData: Prisma.InputJsonObject = {
+    ...currentData,
+    ...patch,
+  };
 
   await prisma.resume.update({
-    where: {
-      id: resume.id,
-    },
+    where: { id: resume.id },
     data: {
-      data: {
-        ...currentData,
-        personalInfo: {
-          ...(currentData.personalInfo as Record<string, unknown>),
-          ...personalInfo,
-        },
-      },
+      data: nextData,
     },
   });
 }
