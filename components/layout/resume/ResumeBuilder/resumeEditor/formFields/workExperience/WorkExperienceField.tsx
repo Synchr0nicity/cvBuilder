@@ -41,10 +41,9 @@ const WorkExperienceField = () => {
       const dataWithId = { ...d, id: uuid() };
 
       await updateResumeData(resumeId, {
-        workExperience: workExperience.push(dataWithId),
+        workExperience: [...workExperience, dataWithId],
       });
 
-      // console.log("new experience", experience);
       toaster.update(saveToastId, {
         title: "Saved",
         type: "success",
