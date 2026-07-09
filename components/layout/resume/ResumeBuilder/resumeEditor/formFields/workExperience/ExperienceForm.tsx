@@ -1,3 +1,4 @@
+"use client";
 import { WorkExperience } from "@/atoms/resumeAtoms";
 import { Experience } from "@/types/resume";
 import { Field, Flex, Input, NumberInput } from "@chakra-ui/react";

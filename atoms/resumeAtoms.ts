@@ -8,6 +8,7 @@ export type Summary = NonNullable<ResumeData["summary"]>;
 export type WorkExperience = NonNullable<ResumeData["workExperience"]>;
 
 export const resumeAtom = atom<AppResume | null>(null);
+
 export const personalInfoAtom = atom(
   (get) => get(resumeAtom)?.data?.personalInfo,
   (get, set, value: PersonalInfo | ((prev: PersonalInfo) => PersonalInfo)) => {
@@ -39,6 +40,29 @@ export const summaryAtom = atom(
       data: {
         ...resume.data,
         summary: value,
+      },
+    });
+  },
+);
+
+export const experienceAtom = atom(
+  (get) => get(resumeAtom)?.data?.workExperience,
+  (get, set, value: Experience) => {
+    const resume = get(resumeAtom);
+    if (!resume) return;
+    const workExperience = get(resumeAtom)?.data?.workExperience;
+
+    // const prev = resume.data?.workExperience as Experience;
+    // const next = typeof value === "function" ? value(prev) : value;
+
+    set(resumeAtom, {
+      ...resume,
+      data: {
+        ...resume.data,
+        workExperience: workExperience?.map((exp) => {
+          if (value.id === exp.id) return exp;
+          else return value;
+        }),
       },
     });
   },

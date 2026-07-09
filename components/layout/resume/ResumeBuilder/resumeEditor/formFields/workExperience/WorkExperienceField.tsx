@@ -3,9 +3,13 @@ import { Button, Flex } from "@chakra-ui/react";
 import { useState } from "react";
 import DraggableHeader from "../DraggableHeader";
 import { motion } from "framer-motion";
-import { resumeAtom, workExperiencesAtom } from "@/atoms/resumeAtoms";
+import {
+  experienceAtom,
+  resumeAtom,
+  workExperiencesAtom,
+} from "@/atoms/resumeAtoms";
 import { v4 as uuid } from "uuid";
-import { useAtom } from "jotai";
+import { useAtom, useSetAtom } from "jotai";
 import ExperienceBox from "./ExperienceBox";
 import ExperienceForm from "./ExperienceForm";
 import { Experience } from "@/types/resume";
@@ -17,9 +21,14 @@ const MotionFlex = motion(Flex);
 
 const WorkExperienceField = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [workExperience, setWorkExperience] = useAtom(workExperiencesAtom);
+  const setWorkExperience = useSetAtom(experienceAtom);
+  // const setWorkExperience = atomFamily(experienceAtomFamily);
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const resume = useAtom(resumeAtom);
+  // const experiences = useAtom(resumeAtom)[0]?.data?.workExperience;
+  const workExperience = useAtom(workExperiencesAtom);
+
+  console.log("atom: ", workExperience[0]);
+
   const params = useParams();
   const resumeId = params.id as string;
   const [trigger, setTrigger] = useState<boolean>(false);
@@ -31,6 +40,7 @@ const WorkExperienceField = () => {
       setTrigger(false);
       return;
     }
+
     try {
       toaster.create({
         id: saveToastId,
@@ -43,6 +53,8 @@ const WorkExperienceField = () => {
       await updateResumeData(resumeId, {
         workExperience: [...workExperience, dataWithId],
       });
+
+      setWorkExperience(dataWithId);
 
       toaster.update(saveToastId, {
         title: "Saved",
@@ -59,6 +71,10 @@ const WorkExperienceField = () => {
         error instanceof Error ? error.message : "Something went wrong",
       );
     }
+    toaster.update(saveToastId, {
+      title: "failed",
+      type: "error",
+    });
 
     setIsCreating(false);
     setTrigger(false);
@@ -95,12 +111,13 @@ const WorkExperienceField = () => {
         {isCreating && (
           <ExperienceForm trigger={trigger} onSubmit={handleSubmit} />
         )}
-        <ExperienceBox experience={undefined} />
+        {workExperience[0]?.map((experience) => {
+          return <ExperienceBox key={experience.id} experience={experience} />;
+        })}
 
         <Flex alignItems="center" width="100%" gap="8px">
           <Button
-            bg="
-                    #F4F6F84D"
+            bg="#F4F6F84D"
             border="solid 1px #E2E8F0"
             borderRadius="8px"
             flex={1}

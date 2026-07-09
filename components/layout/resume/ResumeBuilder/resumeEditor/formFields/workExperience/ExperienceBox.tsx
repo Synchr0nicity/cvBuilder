@@ -1,3 +1,5 @@
+"use client";
+
 import { Experience } from "@/types/resume";
 import { Flex, Heading, Text } from "@chakra-ui/react";
 
@@ -26,14 +28,18 @@ const ExperienceBox = ({
       >
         {experience?.jobTitle ?? "Lead UI/UX Designer"}
       </Heading>
-      <Text mb="0" color="#64748B" fontSize="12px">
-        {experience?.company ?? "TechCorp Solutions"} &#x2022;
-        {experience?.location ?? "San Francisco, CA"}
-      </Text>
-      <Text mb="0" color="#64748BB2" fontSize="10px" fontWeight="500">
-        {experience?.startDate ?? "Jan 2021"} -{" "}
-        {experience?.endDate ?? "Present"}
-      </Text>
+      {experience?.company && (
+        <Text mb="0" color="#64748B" fontSize="12px">
+          {experience?.company ?? "TechCorp Solutions"} &#x2022;
+          {experience?.location ?? "San Francisco, CA"}
+        </Text>
+      )}
+      {experience?.startDate && (
+        <Text mb="0" color="#64748BB2" fontSize="10px" fontWeight="500">
+          {experience?.startDate ?? "Jan 2021"} -{" "}
+          {experience?.endDate ?? "Present"}
+        </Text>
+      )}
     </Flex>
   );
 };
