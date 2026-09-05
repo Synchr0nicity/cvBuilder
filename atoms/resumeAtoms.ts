@@ -1,15 +1,16 @@
 import { atom } from "jotai";
-import type { AppResume, Experience } from "@/types/resume";
+import type { Experience } from "@/types/resume";
 import { atomFamily } from "jotai-family";
+import { Resume } from "@prisma/client";
 
-export type ResumeData = NonNullable<AppResume["data"]>;
-export type PersonalInfo = NonNullable<ResumeData["personalInfo"]>;
-export type Summary = NonNullable<ResumeData["summary"]>;
-export type WorkExperience = NonNullable<ResumeData["workExperience"]>;
+export type ResumeData = NonNullable<Resume["data"]>;
+export type PersonalInfo = NonNullable<Resume["personalInfo"]>;
+export type Summary = NonNullable<Resume["summary"]>;
+export type WorkExperience = NonNullable<Resume["workExperience"]>;
 
-export const resumeAtom = atom<AppResume | null>(null);
+export const resumeAtom = atom<Resume | null>(null);
 export const personalInfoAtom = atom(
-  (get) => get(resumeAtom)?.data?.personalInfo,
+  (get) => get(resumeAtom)?.personalInfo,
   (get, set, value: PersonalInfo | ((prev: PersonalInfo) => PersonalInfo)) => {
     const resume = get(resumeAtom);
     if (!resume) return;
