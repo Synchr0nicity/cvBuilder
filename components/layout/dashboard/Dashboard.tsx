@@ -1,10 +1,10 @@
 "use client";
 import { Flex, Heading, Button } from "@chakra-ui/react";
-import { createResume } from "../resume/actions";
+import { createResume } from "../../form/resume/actions";
 import ResumeCard from "./ResumeCard";
-import { AppResume } from "@/types/resume";
+import { ResumeData } from "@/types/resume";
 
-const Dashboard = ({ resumes }: { resumes: AppResume[] }) => {
+const Dashboard = ({ resumes }: { resumes: ResumeData[] }) => {
   return (
     <Flex width="100%" height="100%" mt="100px" justifyContent="center">
       <Flex flexDir="column" gap="24px" alignItems="center">
@@ -13,8 +13,13 @@ const Dashboard = ({ resumes }: { resumes: AppResume[] }) => {
           onClick={() =>
             createResume({
               title: "Testio",
-              resumeData: "stuff",
-              style: null,
+              workExperience: [],
+              personalInfo: {
+                firstName: "Dominic",
+                lastName: "Abbott",
+                phone: "6034569789",
+              },
+              summary: "I am a hard working bastard",
             })
           }
         >

@@ -6,19 +6,20 @@ import ResumeSidebar from "./ResumeSidebar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { AppResume } from "@/types/resume";
-import { useSetAtom } from "jotai";
-import { resumeAtom } from "@/atoms/resumeAtoms";
+import { ResumeData } from "@/types/resume";
 import PersonalInfoField from "./resumeEditor/formFields/PersonalInfoField";
 import SummaryField from "./resumeEditor/formFields/SummaryField";
 import WorkExperienceField from "./resumeEditor/formFields/workExperience/WorkExperienceField";
+import { useResumeStore } from "@/components/form/resume/lib/resume.store";
+import ResumeEditor from "./resumeEditor/ResumeEditor";
 type ResumeBuilderProps = {
-  resume: AppResume | null;
+  resume: ResumeData | null;
 };
 const ResumeBuilder = ({ resume }: ResumeBuilderProps) => {
-  const setResume = useSetAtom(resumeAtom);
+  const setResume = useResumeStore((s) => s.setResume);
 
   useEffect(() => {
+    if (!resume) return;
     setResume(resume);
   }, [resume, setResume]);
 
@@ -40,22 +41,7 @@ const ResumeBuilder = ({ resume }: ResumeBuilderProps) => {
       justifyContent="space-between"
       overflow="hidden"
     >
-      <Flex
-        className="resume-builder-editor"
-        minH="0"
-        overflowY="auto"
-        p="16px"
-        height="100%"
-        bg="#FFFFFF"
-        flex={1}
-        borderRight="solid 1px #E2E8F0"
-        flexDir="column"
-        gap="20px"
-      >
-        <PersonalInfoField />
-        <SummaryField />
-        <WorkExperienceField />
-      </Flex>
+      <ResumeEditor />
       <ResumeView />
       <ResumeSidebar />
     </Flex>

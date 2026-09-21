@@ -45,7 +45,7 @@ model Resume {
   userId String
 
   title          String
-  workExperience WorkExperience[]
+  workExperiences WorkExperience[]
   personalInfo PersonalInfo?
   summary String?
 

@@ -1,36 +1,36 @@
 "use client";
 import { Button, Flex } from "@chakra-ui/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import DraggableHeader from "../DraggableHeader";
 import { motion } from "framer-motion";
-import { resumeAtom, workExperiencesAtom } from "@/atoms/resumeAtoms";
 import { v4 as uuid } from "uuid";
 import { useAtom } from "jotai";
 import ExperienceBox from "./ExperienceBox";
 import ExperienceForm from "./ExperienceForm";
-import { Experience } from "@/types/resume";
 import { toaster } from "@/components/ui/toaster";
-import { updateResumeData } from "@/components/layout/resume/actions";
+import { updateResumeData } from "@/components/form/resume/actions";
 import { useParams } from "next/navigation";
+import { WorkExperiences } from "@/components/form/resume/lib/resume";
+import { useResumeStore } from "@/components/form/resume/lib/resume.store";
 
 const MotionFlex = motion(Flex);
 
 const WorkExperienceField = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [workExperience, setWorkExperience] = useAtom(workExperiencesAtom);
   const [isCreating, setIsCreating] = useState<boolean>(false);
-  const resume = useAtom(resumeAtom);
   const params = useParams();
   const resumeId = params.id as string;
   const [trigger, setTrigger] = useState<boolean>(false);
   const saveToastId = "experience-save";
+  const resume = useResumeStore((s) => s.resume);
+  const workExperiences = useMemo(() => resume?.workExperiences, [resume]);
 
-  const handleSubmit = async (d: Experience) => {
-    if (d.jobTitle?.length === 0) {
-      console.error("Job title needed");
-      setTrigger(false);
-      return;
-    }
+  const handleSubmit = async (d: WorkExperiences) => {
+    // if (d.jobTitle?.length === 0) {
+    //   console.error("Job title needed");
+    //   setTrigger(false);
+    //   return;
+    // }
     try {
       toaster.create({
         id: saveToastId,
@@ -41,7 +41,7 @@ const WorkExperienceField = () => {
       const dataWithId = { ...d, id: uuid() };
 
       await updateResumeData(resumeId, {
-        workExperience: [...workExperience, dataWithId],
+        // workExperience: [...workExperiences, dataWithId],
       });
 
       toaster.update(saveToastId, {

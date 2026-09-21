@@ -1,17 +1,11 @@
 "use client";
 
-import {
-  personalInfoAtom,
-  workExperiencesAtom,
-  summaryAtom,
-} from "@/atoms/resumeAtoms";
+import { useResumeStore } from "@/components/form/resume/lib/resume.store";
 import { Flex, Heading, Text } from "@chakra-ui/react";
-import { useAtomValue } from "jotai";
 
 const ResumeView = () => {
-  const personalInfo = useAtomValue(personalInfoAtom);
-  const summary = useAtomValue(summaryAtom);
-  const workExperiences = useAtomValue(workExperiencesAtom);
+  const resume = useResumeStore((s) => s.resume);
+  const personalInfo = resume?.personalInfo;
 
   return (
     <Flex height="100%" flex={2} p="48px">

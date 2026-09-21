@@ -1,16 +1,17 @@
 "use client";
-import { Flex, Field, Input } from "@chakra-ui/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { Flex, Field, Input, Button } from "@chakra-ui/react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import DraggableHeader from "./DraggableHeader";
 import { useForm, useWatch } from "react-hook-form";
-import { PersonalInfo, personalInfoAtom } from "@/atoms/resumeAtoms";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import debounce from "lodash/debounce";
 import { useParams } from "next/navigation";
 import { toaster } from "@/components/ui/toaster";
 import { Prisma } from "@prisma/client";
-import { updateResumeData } from "../../../actions";
+import { PersonalInfo, personalInfoSchema } from "../../../lib/resume";
+import { useResumeStore } from "@/components/form/resume/lib/resume.store";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { updatePersonalInfo } from "../../../actions";
 
 const MotionFlex = motion(Flex);
 
@@ -18,55 +19,76 @@ const PersonalInfoField = () => {
   const params = useParams();
   const resumeId = params.id as string;
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [personalInfo, setPersonalInfo] = useAtom(personalInfoAtom);
   const saveToastId = "personal-info-save";
+  const resume = useResumeStore((s) => s.resume);
 
-  const {
-    register,
-    control,
-    reset,
-    formState: { isDirty },
-  } = useForm<PersonalInfo>({
-    defaultValues: personalInfo ?? {},
+  const personalInfo = useMemo(() => resume?.personalInfo, [resume]);
+
+  console.log("personalinfo data from zustand", personalInfo);
+
+  const { register, handleSubmit, reset } = useForm<PersonalInfo>({
+    defaultValues: {
+      firstName: personalInfo?.firstName ?? "",
+      lastName: personalInfo?.lastName ?? "",
+      phone: personalInfo?.phone ?? "",
+      email: personalInfo?.email ?? "",
+      profession: personalInfo?.profession ?? "",
+    },
   });
 
+  useEffect(() => {
+    if (personalInfo) {
+      reset({
+        firstName: personalInfo.firstName,
+        lastName: personalInfo.lastName,
+        phone: personalInfo.phone,
+        email: personalInfo.email,
+        profession: personalInfo.profession,
+      });
+    }
+  }, [personalInfo, reset]);
   // useEffect(() => {
   //   if (!personalInfo) return;
 
   //   reset(personalInfo, { keepDirty: false });
   // }, [personalInfo, reset]);
 
-  const watchedField = useWatch({ control });
+  const onSubmit = async (data: PersonalInfo) => {
+    await updatePersonalInfo(resume?.id ?? "", data);
+    console.log("personal info data being submitted", data);
+  };
 
-  const debouncedSave = useMemo(
-    () =>
-      debounce(async (data: Partial<PersonalInfo>) => {
-        try {
-          toaster.create({
-            id: saveToastId,
-            title: "Saving",
-            type: "loading",
-          });
+  // const watchedField = useWatch({ control });
 
-          await updateResumeData(resumeId, {
-            personalInfo: data as Prisma.InputJsonObject,
-          });
+  // const debouncedSave = useMemo(
+  //   () =>
+  //     debounce(async (data: Partial<PersonalInfo>) => {
+  //       try {
+  //         toaster.create({
+  //           id: saveToastId,
+  //           title: "Saving",
+  //           type: "loading",
+  //         });
 
-          toaster.update(saveToastId, {
-            title: "Saved",
-            type: "success",
-          });
-        } catch (error) {
-          toaster.create({
-            title: "Failed to save",
-            description:
-              error instanceof Error ? error.message : "Something went wrong",
-            type: "error",
-          });
-        }
-      }, 800),
-    [resumeId],
-  );
+  //         await updateResumeData(resumeId, {
+  //           personalInfo: data as Prisma.InputJsonObject,
+  //         });
+
+  //         toaster.update(saveToastId, {
+  //           title: "Saved",
+  //           type: "success",
+  //         });
+  //       } catch (error) {
+  //         toaster.create({
+  //           title: "Failed to save",
+  //           description:
+  //             error instanceof Error ? error.message : "Something went wrong",
+  //           type: "error",
+  //         });
+  //       }
+  //     }, 800),
+  //   [resumeId],
+  // );
 
   // useEffect(() => {
   //   if (!isDirty) return;
@@ -102,7 +124,7 @@ const PersonalInfoField = () => {
         icon="fa-user"
         section="Personal Info"
       />
-      <form>
+      <form onSubmit={handleSubmit(onSubmit)}>
         <MotionFlex
           flexDir="column"
           gap="16px"
@@ -137,7 +159,7 @@ const PersonalInfoField = () => {
               <Input
                 {...register("firstName")}
                 bg="
-            #F4F6F8"
+              #F4F6F8"
                 border="solid 1px #E2E8F0"
                 borderRadius="8px"
                 width="100%"
@@ -165,7 +187,7 @@ const PersonalInfoField = () => {
               <Input
                 {...register("lastName")}
                 bg="
-            #F4F6F8"
+              #F4F6F8"
                 border="solid 1px #E2E8F0"
                 borderRadius="8px"
                 width="100%"
@@ -223,7 +245,7 @@ const PersonalInfoField = () => {
               <Input
                 {...register("email")}
                 bg="
-            #F4F6F8"
+              #F4F6F8"
                 border="solid 1px #E2E8F0"
                 borderRadius="8px"
                 width="100%"
@@ -251,7 +273,7 @@ const PersonalInfoField = () => {
               <Input
                 {...register("phone")}
                 bg="
-            #F4F6F8"
+              #F4F6F8"
                 border="solid 1px #E2E8F0"
                 borderRadius="8px"
                 width="100%"
@@ -262,6 +284,7 @@ const PersonalInfoField = () => {
             </Field.Root>
           </Flex>
         </MotionFlex>
+        <Button type="submit">SUBMIT</Button>
       </form>
     </Flex>
   );

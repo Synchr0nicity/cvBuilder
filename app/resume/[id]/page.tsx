@@ -1,7 +1,7 @@
 import { auth } from "@/auth";
-import ResumeBuilder from "@/components/layout/resume/ResumeBuilder/ResumeBuilder";
+import ResumeBuilder from "@/components/form/resume/ResumeBuilder/ResumeBuilder";
 import { prisma } from "@/lib/prisma";
-import { AppResume } from "@/types/resume";
+import { ResumeData } from "@/types/resume";
 import { Flex } from "@chakra-ui/react";
 import { notFound, redirect } from "next/navigation";
 
@@ -12,12 +12,14 @@ const ResumePage = async ({ params }: { params: Promise<{ id: string }> }) => {
     redirect(`/login?callbackUrl=/resume/${id}`);
   }
 
-  console.log("RESUME PAGE SESSION:", session);
-
   const resume = await prisma.resume.findFirst({
     where: {
       id,
       userId: session.user.id,
+    },
+    include: {
+      personalInfo: true,
+      workExperiences: true,
     },
   });
 
@@ -27,7 +29,7 @@ const ResumePage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   return (
     <Flex width="100%" minH="0" height="calc(100vh - 63px)" overflow="hidden">
-      <ResumeBuilder resume={resume as AppResume} />
+      <ResumeBuilder resume={resume as ResumeData} />
     </Flex>
   );
 };
