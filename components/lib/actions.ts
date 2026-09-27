@@ -38,10 +38,6 @@ export async function updatePersonalInfo(
   resumeId: string,
   patch: PersonalInfo,
 ) {
-  console.log("updatePersonalInfo called");
-  console.log("resumeId:", resumeId);
-  console.log("patch:", patch);
-
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -54,8 +50,6 @@ export async function updatePersonalInfo(
       userId: session.user.id,
     },
   });
-
-  console.log("resume found:", resume);
 
   if (!resume) {
     throw new Error("Resume not found");
@@ -101,10 +95,12 @@ export async function updateSummary(resumeId: string, patch: string) {
     throw new Error("Resume not found");
   }
 
-  await prisma.resume.update({
+  const updated = await prisma.resume.update({
     where: { id: resume.id },
     data: {
       summary: patch,
     },
   });
+
+  return updated;
 }

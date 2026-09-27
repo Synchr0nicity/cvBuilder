@@ -7,6 +7,8 @@ type ResumeStore = {
   setSummary: (summary: string) => void;
   setPersonalInfo: (personalInfo: PersonalInfo) => void;
   setWorkExperiences: (workExperience: WorkExperience) => void;
+  autoSaveStatus: string | null;
+  setAutoSaveStatus: (status: string) => void;
 };
 
 export const useResumeStore = create<ResumeStore>((set) => ({
@@ -24,4 +26,6 @@ export const useResumeStore = create<ResumeStore>((set) => ({
     set((state) => ({
       resume: state.resume ? { ...state.resume, workExperience } : null,
     })),
+  autoSaveStatus: null,
+  setAutoSaveStatus: (status) => set({ autoSaveStatus: status }),
 }));

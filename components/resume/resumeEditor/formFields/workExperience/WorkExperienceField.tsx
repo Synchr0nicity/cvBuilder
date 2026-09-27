@@ -8,10 +8,10 @@ import { useAtom } from "jotai";
 import ExperienceBox from "./ExperienceBox";
 import ExperienceForm from "./ExperienceForm";
 import { toaster } from "@/components/ui/toaster";
-import { updateResumeData } from "@/components/form/resume/actions";
+import { updateResumeData } from "@/components/lib/actions";
 import { useParams } from "next/navigation";
-import { WorkExperiences } from "@/components/form/resume/lib/resume";
-import { useResumeStore } from "@/components/form/resume/lib/resume.store";
+import { WorkExperiences } from "@/components/lib/resume";
+import { useResumeStore } from "@/components/lib/resume.store";
 
 const MotionFlex = motion(Flex);
 

@@ -1,6 +1,6 @@
 "use client";
 import { Flex, Heading, Button } from "@chakra-ui/react";
-import { createResume } from "../../form/resume/actions";
+import { createResume } from "../../lib/actions";
 import ResumeCard from "./ResumeCard";
 import { ResumeData } from "@/types/resume";
 

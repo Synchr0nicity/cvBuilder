@@ -1,5 +1,5 @@
 import { auth } from "@/auth";
-import ResumeBuilder from "@/components/form/resume/ResumeBuilder/ResumeBuilder";
+import ResumeBuilder from "@/components/resume/form/ResumeBuilder/ResumeBuilder";
 import { prisma } from "@/lib/prisma";
 import { ResumeData } from "@/types/resume";
 import { Flex } from "@chakra-ui/react";

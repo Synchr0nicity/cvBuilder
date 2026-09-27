@@ -11,10 +11,10 @@ export const workExperiencesSchema = z.array(workExperienceSchema);
 
 export const personalInfoSchema = z.object({
   firstName: z.string().min(1, "First name is required."),
-  lastName: z.string(),
-  phone: z.string(),
-  email: z.string(),
-  profession: z.string(),
+  lastName: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.string().optional(),
+  profession: z.string().optional(),
 });
 
 export const resumeSchema = z.object({

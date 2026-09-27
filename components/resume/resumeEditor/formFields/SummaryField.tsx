@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 import { debounce } from "lodash";
 import { useParams } from "next/navigation";
 import { toaster } from "@/components/ui/toaster";
-import { useResumeStore } from "@/components/form/resume/lib/resume.store";
+import { useResumeStore } from "@/components/lib/resume.store";
 
 const MotionFlex = motion(Flex);
 
