@@ -6,7 +6,7 @@ const PersonalInfo = () => {
   const personalInfo = resume?.personalInfo;
 
   return (
-    <>
+    <Flex w="100%" justifyContent="space-between">
       <Flex flexDirection="column">
         <Heading>
           {personalInfo?.firstName || "First Name"}{" "}
@@ -20,7 +20,7 @@ const PersonalInfo = () => {
         <Text>{personalInfo?.email}</Text>
         <Text>{personalInfo?.phone}</Text>
       </Stack>
-    </>
+    </Flex>
   );
 };
 

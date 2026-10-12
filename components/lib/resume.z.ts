@@ -19,7 +19,7 @@ export const personalInfoSchema = z.object({
 
 export const resumeSchema = z.object({
   title: z.string().min(1, "Title is required."),
-  workExperience: z.array(workExperienceSchema),
+  workExperiences: z.array(workExperienceSchema),
   personalInfo: personalInfoSchema.nullable(),
   summary: z.string().nullable(),
 });

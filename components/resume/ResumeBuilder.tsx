@@ -1,14 +1,14 @@
 "use client";
 
 import { Box, Flex, Text } from "@chakra-ui/react";
-import ResumeView from "../../../resume/view/ResumeView";
-import ResumeSidebar from "../../../resume/sidebar/ResumeSidebar";
+import ResumeView from "./view/ResumeView";
+import ResumeSidebar from "./sidebar/ResumeSidebar";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { ResumeData } from "@/types/resume";
 import { useResumeStore } from "@/components/lib/resume.store";
-import ResumeEditor from "../../resumeEditor/ResumeEditor";
+import ResumeEditor from "./form/ResumeForm";
 type ResumeBuilderProps = {
   resume: ResumeData | null;
 };

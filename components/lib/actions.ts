@@ -104,3 +104,46 @@ export async function updateSummary(resumeId: string, patch: string) {
 
   return updated;
 }
+
+export async function updateWorkExperience(
+  resumeId: string,
+  patch: PersonalInfo,
+) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    throw new Error("Not authenticated");
+  }
+
+  const resume = await prisma.resume.findFirst({
+    where: {
+      id: resumeId,
+      userId: session.user.id,
+    },
+  });
+
+  if (!resume) {
+    throw new Error("Resume not found");
+  }
+
+  const updated = await prisma.resume.update({
+    where: {
+      id: resume.id,
+    },
+    data: {
+      personalInfo: {
+        upsert: {
+          create: patch,
+          update: patch,
+        },
+      },
+    },
+    include: {
+      personalInfo: true,
+    },
+  });
+
+  revalidatePath(`/resume/${resumeId}`);
+
+  return updated;
+}

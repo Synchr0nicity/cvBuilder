@@ -1,16 +1,14 @@
 "use client";
 import { Button, Flex } from "@chakra-ui/react";
 import { useMemo, useState } from "react";
-import DraggableHeader from "../DraggableHeader";
+import DraggableHeader from "../../components/DraggableHeader";
 import { motion } from "framer-motion";
 import { v4 as uuid } from "uuid";
-import { useAtom } from "jotai";
 import ExperienceBox from "./ExperienceBox";
 import ExperienceForm from "./ExperienceForm";
 import { toaster } from "@/components/ui/toaster";
-import { updateResumeData } from "@/components/lib/actions";
 import { useParams } from "next/navigation";
-import { WorkExperiences } from "@/components/lib/resume";
+import { WorkExperiences } from "@/components/lib/resume.z";
 import { useResumeStore } from "@/components/lib/resume.store";
 
 const MotionFlex = motion(Flex);
@@ -23,7 +21,7 @@ const WorkExperienceField = () => {
   const [trigger, setTrigger] = useState<boolean>(false);
   const saveToastId = "experience-save";
   const resume = useResumeStore((s) => s.resume);
-  const workExperiences = useMemo(() => resume?.workExperiences, [resume]);
+  const workExperiences = resume?.workExperiences;
 
   const handleSubmit = async (d: WorkExperiences) => {
     // if (d.jobTitle?.length === 0) {
@@ -40,9 +38,9 @@ const WorkExperienceField = () => {
 
       const dataWithId = { ...d, id: uuid() };
 
-      await updateResumeData(resumeId, {
-        // workExperience: [...workExperiences, dataWithId],
-      });
+      // await updateResumeData(resumeId, {
+      // workExperience: [...workExperiences, dataWithId],
+      // });
 
       toaster.update(saveToastId, {
         title: "Saved",

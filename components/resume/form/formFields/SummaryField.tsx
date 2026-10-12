@@ -1,13 +1,15 @@
 "use client";
 import { Field, Flex, Textarea } from "@chakra-ui/react";
-import { useMemo, useState } from "react";
-import DraggableHeader from "./DraggableHeader";
+import { useEffect, useMemo, useRef, useState } from "react";
+import DraggableHeader from "../components/DraggableHeader";
 import { motion } from "framer-motion";
 
 import { debounce } from "lodash";
 import { useParams } from "next/navigation";
 import { toaster } from "@/components/ui/toaster";
 import { useResumeStore } from "@/components/lib/resume.store";
+import { useForm, useWatch } from "react-hook-form";
+import { updateSummary } from "@/components/lib/actions";
 
 const MotionFlex = motion(Flex);
 
@@ -19,42 +21,69 @@ const SummaryField = () => {
   const setSummary = useResumeStore((s) => s.setSummary);
   const summary = useResumeStore((s) => s.resume)?.summary ?? "";
 
-  // const debouncedSave = useMemo(
-  //   () =>
-  //     debounce(async (data: string) => {
-  //       try {
-  //         toaster.create({
-  //           id: saveToastId,
-  //           title: "Saving",
-  //           type: "loading",
-  //         });
-
-  //         await updateResumeData(resumeId, {
-  //           summary: data as string,
-  //         });
-
-  //         toaster.update(saveToastId, {
-  //           title: "Saved",
-  //           type: "success",
-  //         });
-  //       } catch (error) {
-  //         toaster.create({
-  //           title: "Failed to save",
-  //           description:
-  //             error instanceof Error ? error.message : "Something went wrong",
-  //           type: "error",
-  //         });
-  //       }
-  //     }, 800),
-  //   [resumeId],
-  // );
+  const previousSummaryRef = useRef(summary);
+  const latestSummaryRef = useRef(summary);
+  const saveIdRef = useRef(0);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
 
+    previousSummaryRef.current = latestSummaryRef.current;
+    latestSummaryRef.current = value;
+
+    toaster.create({
+      id: saveToastId,
+      title: "Saving",
+      type: "loading",
+    });
     setSummary(value);
-    // debouncedSave(value);
   };
+
+  const isInitialRender = useRef(true);
+
+  useEffect(() => {
+    if (isInitialRender.current) {
+      isInitialRender.current = false;
+      return;
+    }
+
+    const saveId = ++saveIdRef.current;
+    const previousSummary = previousSummaryRef.current;
+
+    const timeout = setTimeout(async () => {
+      try {
+        toaster.create({
+          id: saveToastId,
+          title: "Saving",
+          type: "loading",
+        });
+
+        await updateSummary(resumeId, summary);
+
+        toaster.update(saveToastId, {
+          title: "Saved",
+          type: "success",
+        });
+      } catch (error) {
+        if (
+          saveId === saveIdRef.current &&
+          latestSummaryRef.current === summary
+        ) {
+          setSummary(previousSummary);
+          latestSummaryRef.current = previousSummary;
+        }
+
+        toaster.create({
+          title: "Failed to save",
+          description:
+            error instanceof Error ? error.message : "Something went wrong",
+          type: "error",
+        });
+      }
+    }, 800);
+
+    return () => clearTimeout(timeout);
+  }, [summary, resumeId, setSummary]);
 
   return (
     <Flex
@@ -101,7 +130,7 @@ const SummaryField = () => {
             borderRadius="8px"
             width="100%"
             color="black"
-            name="firstName"
+            name="summary"
             placeholder="Award-winning product designer with 8+ 
 years of experience creating intuitive, user-
 centric digital experiences. Proven track 

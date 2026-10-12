@@ -1,55 +1,66 @@
 "use client";
-import { Flex, Field, Input, Button } from "@chakra-ui/react";
-import { useEffect, useMemo, useState } from "react";
+import {
+  Flex,
+  Field,
+  Input,
+  // Button
+} from "@chakra-ui/react";
+import {
+  // useEffect, useMemo,
+  useState,
+} from "react";
 import { motion } from "framer-motion";
-import DraggableHeader from "./DraggableHeader";
-import { useForm, useWatch } from "react-hook-form";
-import debounce from "lodash/debounce";
-import { useParams } from "next/navigation";
-import { toaster } from "@/components/ui/toaster";
-import { PersonalInfo, personalInfoSchema } from "../../../lib/resume";
-import { useResumeStore } from "@/components/lib/resume.store";
-import { updatePersonalInfo } from "../../../lib/actions";
+import DraggableHeader from "../components/DraggableHeader";
+import { useFormContext } from "react-hook-form";
+import { Resume } from "@/components/lib/resume.z";
+// import { useForm, useWatch } from "react-hook-form";
+// import debounce from "lodash/debounce";
+// import { useParams } from "next/navigation";
+// import { toaster } from "@/components/ui/toaster";
+// import { PersonalInfo, personalInfoSchema } from "../../../lib/resume.z";
+// import { useResumeStore } from "@/components/lib/resume.store";
+// import { updatePersonalInfo } from "../../../lib/actions";
 
 const MotionFlex = motion(Flex);
 
 const PersonalInfoField = () => {
-  const params = useParams();
-  const resumeId = params.id as string;
+  // const params = useParams();
+  // const resumeId = params.id as string;
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const saveToastId = "personal-info-save";
-  const resume = useResumeStore((s) => s.resume);
-  const setPersonalInfo = useResumeStore((s) => s.setPersonalInfo);
+  const { register } = useFormContext<Resume>();
+  // const saveToastId = "personal-info-save";
+  // const resume = useResumeStore((s) => s.resume);
+  // const setPersonalInfo = useResumeStore((s) => s.setPersonalInfo);
 
-  const personalInfo = useMemo(() => resume?.personalInfo, [resume]);
+  // const personalInfo = useMemo(() => resume?.personalInfo, [resume]);
 
-  const {
-    register,
-    reset,
-    control,
-    formState: { isDirty },
-  } = useForm<PersonalInfo>({
-    // resolver: zodResolver(personalInfoSchema),
-    defaultValues: {
-      firstName: personalInfo?.firstName ?? "",
-      lastName: personalInfo?.lastName ?? "",
-      phone: personalInfo?.phone ?? "",
-      email: personalInfo?.email ?? "",
-      profession: personalInfo?.profession ?? "",
-    },
-  });
+  // const {
+  //   register,
+  //   reset,
+  //   control,
+  //   formState: { isDirty },
+  // } = useForm<PersonalInfo>({
+  //   // resolver: zodResolver(personalInfoSchema),
+  //   defaultValues: {
+  //     firstName: personalInfo?.firstName ?? "",
+  //     lastName: personalInfo?.lastName ?? "",
+  //     phone: personalInfo?.phone ?? "",
+  //     email: personalInfo?.email ?? "",
+  //     profession: personalInfo?.profession ?? "",
+  //   },
+  // });
 
-  useEffect(() => {
-    if (personalInfo) {
-      reset({
-        firstName: personalInfo.firstName,
-        lastName: personalInfo.lastName,
-        phone: personalInfo.phone,
-        email: personalInfo.email,
-        profession: personalInfo.profession,
-      });
-    }
-  }, [personalInfo, reset]);
+  // useEffect(() => {
+  //   if (personalInfo) {
+  //     reset({
+  //       firstName: personalInfo.firstName,
+  //       lastName: personalInfo.lastName,
+  //       phone: personalInfo.phone,
+  //       email: personalInfo.email,
+  //       profession: personalInfo.profession,
+  //     });
+  //   }
+  // }, [personalInfo, reset]);
 
   // useEffect(() => {
   //   if (!personalInfo) return;
@@ -62,68 +73,68 @@ const PersonalInfoField = () => {
   //   console.log("personal info data being submitted", data);
   // };
 
-  const watchedField = useWatch({ control });
+  // const watchedField = useWatch({ control });
 
-  const debouncedSave = useMemo(
-    () =>
-      debounce(async (data: PersonalInfo) => {
-        const currentPersonalInfo = personalInfo;
-        try {
-          toaster.create({
-            id: saveToastId,
-            title: "Saving",
-            type: "loading",
-          });
+  // const debouncedSave = useMemo(
+  //   () =>
+  //     debounce(async (data: PersonalInfo) => {
+  //       const currentPersonalInfo = personalInfo;
+  //       try {
+  //         toaster.create({
+  //           id: saveToastId,
+  //           title: "Saving",
+  //           type: "loading",
+  //         });
 
-          await updatePersonalInfo(resumeId, data);
+  //         await updatePersonalInfo(resumeId, data);
 
-          toaster.update(saveToastId, {
-            title: "Saved",
-            type: "success",
-          });
-        } catch (error) {
-          toaster.create({
-            title: "Failed to save",
-            description:
-              error instanceof Error ? error.message : "Something went wrong",
-            type: "error",
-          });
-          setPersonalInfo({
-            firstName: currentPersonalInfo?.firstName ?? "",
-            lastName: currentPersonalInfo?.lastName,
-            phone: currentPersonalInfo?.phone,
-            email: currentPersonalInfo?.email,
-            profession: currentPersonalInfo?.profession,
-          });
-        }
-      }, 800),
-    [personalInfo, resumeId, setPersonalInfo],
-  );
+  //         toaster.update(saveToastId, {
+  //           title: "Saved",
+  //           type: "success",
+  //         });
+  //       } catch (error) {
+  //         toaster.create({
+  //           title: "Failed to save",
+  //           description:
+  //             error instanceof Error ? error.message : "Something went wrong",
+  //           type: "error",
+  //         });
+  //         setPersonalInfo({
+  //           firstName: currentPersonalInfo?.firstName ?? "",
+  //           lastName: currentPersonalInfo?.lastName,
+  //           phone: currentPersonalInfo?.phone,
+  //           email: currentPersonalInfo?.email,
+  //           profession: currentPersonalInfo?.profession,
+  //         });
+  //       }
+  //     }, 800),
+  //   [personalInfo, resumeId, setPersonalInfo],
+  // );
 
-  useEffect(() => {
-    if (!isDirty) return;
-    if (!watchedField) return;
+  // useEffect(() => {
+  //   if (!isDirty) return;
+  //   if (!watchedField) return;
 
-    const result = personalInfoSchema.safeParse(watchedField);
+  //   const result = personalInfoSchema.safeParse(watchedField);
 
-    if (!result.success) return;
+  //   if (!result.success) return;
 
-    // const newData = {
-    //   ...watchedField,
-    //   firstName: watchedField.firstName ?? "",
-    // };
+  //   // const newData = {
+  //   //   ...watchedField,
+  //   //   firstName: watchedField.firstName ?? "",
+  //   // };
 
-    setPersonalInfo({ ...result.data });
+  //   setPersonalInfo({ ...result.data });
 
-    debouncedSave(result.data);
-  }, [watchedField, setPersonalInfo, debouncedSave, isDirty]);
+  //   debouncedSave(result.data);
+  // }, [watchedField, setPersonalInfo, debouncedSave, isDirty]);
 
-  useEffect(() => {
-    return () => {
-      debouncedSave.cancel();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     debouncedSave.cancel();
+  //   };
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return (
     <Flex
@@ -173,7 +184,7 @@ const PersonalInfoField = () => {
             </Flex>
 
             <Input
-              {...register("firstName")}
+              {...register("personalInfo.firstName")}
               bg="
               #F4F6F8"
               border="solid 1px #E2E8F0"
@@ -201,7 +212,7 @@ const PersonalInfoField = () => {
             </Flex>
 
             <Input
-              {...register("lastName")}
+              {...register("personalInfo.lastName")}
               bg="
               #F4F6F8"
               border="solid 1px #E2E8F0"
@@ -226,7 +237,7 @@ const PersonalInfoField = () => {
           </Flex>
 
           <Input
-            {...register("profession")}
+            {...register("personalInfo.profession")}
             bg="
             #F4F6F8"
             border="solid 1px #E2E8F0"
@@ -255,7 +266,7 @@ const PersonalInfoField = () => {
             </Flex>
 
             <Input
-              {...register("email")}
+              {...register("personalInfo.email")}
               bg="
               #F4F6F8"
               border="solid 1px #E2E8F0"
@@ -283,7 +294,7 @@ const PersonalInfoField = () => {
             </Flex>
 
             <Input
-              {...register("phone")}
+              {...register("personalInfo.phone")}
               bg="
               #F4F6F8"
               border="solid 1px #E2E8F0"
